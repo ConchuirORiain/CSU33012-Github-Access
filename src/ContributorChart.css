@@ -1,0 +1,47 @@
+body {
+  font-family: Helvetica;
+}
+
+.update {
+  color: #888888;
+  position:absolute;
+  top: 10px;
+  left: 10px;
+  padding: 5px 10px;
+  margin: 10px;
+  cursor: pointer;
+  border: 1px solid #999999;
+  border-radius: 3px;
+}
+
+.circle{
+    background: red;
+    background-color: red;
+    position: absolute;
+    fill: red;
+    stroke: blue;
+    stroke-width: 10px;
+}
+
+.node circle {
+  fill: red;
+  stroke: blue;
+  stroke-width: 20px;
+}
+
+.node text {
+  fill: #888888;
+  stroke: none;
+  font-size: .6em;
+}
+
+.links line {
+  stroke: black;
+  stroke-opacity: .3;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: lightgrey;
+  padding: 10px;
+}

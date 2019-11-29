@@ -1,6 +1,7 @@
 
 import React from 'react'
 import * as d3 from 'd3'
+import './Loading.js'
 import './ContributorChart.css'
 
 class Chart extends React.Component{
@@ -118,6 +119,12 @@ class Chart extends React.Component{
             <div className='chartContainer'>
               <svg className='chart' onDblClick={this.props.onDblClick}>
               </svg>
+            </div>
+            <div>
+            <button className='btn btn-primary' type='submit' onClick={this.props.onReturn}>Return</button>
+            </div>
+            <div>
+            <button className='btn btn-primary' type='submit' onClick={this.props.onChange}>Look at Languages</button>
             </div>
           </div>
         ); 

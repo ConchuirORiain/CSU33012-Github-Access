@@ -3,6 +3,7 @@ import barChart from './barChart.js';
 import Form from './Form.js';
 import Chart from './Chart.js'
 import Loading from './Loading.js'
+import PieChart from './PieChart.js'
 import './App.css';
 require('dotenv').config()
 const Octokit = require('@octokit/rest');
@@ -19,9 +20,13 @@ class App extends React.Component {
             loading: false,
             username: '',
             repoUserName: '',
-            repoUserSubmitted: 'false',
+            repoUserSubmitted: false,
             userData: {},
-            repoData: {},
+            userInfo: '',
+            repoData: '',
+            languageArray: '',
+            infoArray: '',
+            gettingLang: false,
             data: {
                 nodes: [],
                 links: []
@@ -42,6 +47,7 @@ class App extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReturn = this.handleReturn.bind(this);
         this.handleDblClick = this.handleDblClick.bind(this);
+        this.handleGraphButton = this.handleGraphButton.bind(this);
     }
 
     handleChange(event){
@@ -87,22 +93,24 @@ class App extends React.Component {
                                         
              let tempNodesTwo = [];
              let tempLinksTwo = [];
-             
+             let dataLength = []             
              await octokit.users.listFollowersForUser({username: tempNodes[c].name})
                 .then(res => {
-
+                        
+                    dataLength = res.data.length;
                     for(let j = 0;  j < res.data.length; j++){
                             tempNodesTwo.push({name: res.data[j].login,  index: j, group: 2});
                     //        tempLinksTwo.push({source:c, target: j});
                             if(j > 14) break;
                         }
                     });
-                
+            
+            highestIndex += dataLength
 
-                for(let j = 0; j < tempNodesTwo.length; j++){
-                    tempLinksTwo.push({source:c, target: (j+tempNodesTwo.length)});
-                    console.log("linking" + c + "to" + j);
-                }
+            for(let j = 0; j < tempNodesTwo.length; j++){
+                tempLinksTwo.push({source:c, target: (j)});
+                console.log("linking" + c + "to" + j);
+            }
 
             tempNodesToConcat.push(...tempNodesTwo);
             tempLinksToConcat.push(...tempLinksTwo);
@@ -126,28 +134,87 @@ class App extends React.Component {
         console.log(x);
     }
 
+    async handleGraphButton(event){
+        this.setState({loading:true});
+        await octokit.users.getByUsername({username: this.state.username})
+            .then(result => {
+                this.setState({userInfo: result.data});
+            });
+
+        await octokit.repos.listForUser({username: this.state.username})
+            .then(result => {
+                this.setState({repoData: result.data});
+         });
+
+        var array = [];
+        var lang = null;
+
+        for(let i =0; i <this.repoData.length; i++){
+            lang = this.repoData[i].language;
+            if(!array.includes(lang) && lang != null){
+                array.push(lang);
+            }
+        }
+
+        var tempArray =[];
+        for (let i = 0; i < this.repoData.length; i++){
+            if(this.repoData[i].language !== null){
+                tempArray.push(this.repoData[i].language);
+            }
+        }
+
+        tempArray.sort();
+        var a1 = [];
+        var a2 = [];
+        var prev = null;
+        for(let i = 0; i < tempArray.length; i++){
+            if(tempArray[i] !== prev ){
+                a1.push(tempArray[i])
+                a2.push(1);
+            }else{
+                a2[a2.length -1]++;
+            }
+            prev = tempArray[i];
+        }
+
+        this.setState({languageArray: a1});
+        this.setState({infoArray: a2});
+        this.setState({loading: false});    
+        this.setState({repoUserSubmitted: true});
+    }
+
+
+
+
+
     handleReturn(event){
         this.setState({
             userSubmitted: false,
-            userData: {}
+            data: {}
         });
     }
 
     handleDblClick(event){
-        this.setState({repoUserName: event.target.value});
         console.log(this.state.repoUserName);
     }
     
     render() {
       return (
         <div className="App">
-            {!this.state.userSubmitted && !this.state.loading && <img src={ require('./github.png')} className ="logo" alt="logo" />}
+            {!this.state.userSubmitted && !this.state.loading && !this.state.repoUserSubmitted && 
+                    <img src={ require('./github.png')} className ="logo" alt="logo" />}
                  <div className= "app-container">
-                     {!this.state.userSubmitted && !this.state.loading  
+                     {!this.state.userSubmitted && !this.state.loading && !this.state.repoUserSubmitted   
                             && <Form onChangeValue={this.handleChange} onSubmit= {this.handleSubmit}/>} 
-                     {!this.state.userSubmitted && this.state.loading && <Loading/>}
-                     {this.state.userSubmitted && !this.state.loading && <Chart data = {this.state.data} username = {this.state.username}
-                                                                            onDblClick = {this.handleDblClick} />}
+                     {!this.state.userSubmitted && this.state.loading && !this.state.repoUserSubmitted && <Loading/>}
+                     {this.state.userSubmitted && !this.state.loading && !this.state.repoUserSubmitted && 
+                            <Chart onReturn={this.handleReturn} 
+                            data = {this.state.data} username = {this.state.username}
+                            onChange ={this.handleGraphButton} 
+                            onDoubleClick = {this.handleDblClick} />}
+                    {this.state.userSubmitted && !this.state.repoUserSubmitted && this.state.loading && <Loading/>}
+                    {this.state.repoUserSubmitted && !this.state.loading && this.state.usernameSubmtted &&
+                       <PieChart repoUserName = {this.state.repoUserName} data = {this.state.languageArray} info = {this.state.infoArray}/>}
                 </div> 
                    {/* *<barChart data={this.state.data} width={this.state.width} height={this.state.height}/> */}
         </div>

@@ -1,3 +1,11 @@
+## Github Access Project
+
+To use this project clones it, create an environment variable with a personal github access token (GITHUB\_ACCESS\_TOKEN)
+and write npm start into a bash terminal in the directory
+
+This project gets the first 15 followers of a user and displays the first 15 followers of those user in a network graph
+It also displays a pieChart showing the ratio of languages used.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

@@ -87,8 +87,6 @@ class Chart extends React.Component{
               tooltip.style('opacity', 0)
                 .style('left', '0px')
                 .style('top', '0px');
-            }).on('dblclick', d => {
-               console.log(d.name); return d.name;
             });
     
         const ticked = () => {
@@ -115,9 +113,10 @@ class Chart extends React.Component{
     render(){  
         return (
           <div className='container'>
-            <h1>{this.props.username.toUpper}</h1>
+            <h1>{this.props.username}</h1>
+            <h2>Followers and their followers</h2>
             <div className='chartContainer'>
-              <svg className='chart' onDblClick={this.props.onDblClick}>
+              <svg className='chart' >
               </svg>
             </div>
             <div>
